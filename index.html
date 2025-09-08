@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>C Code Archive</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    :root {
+      --bg-color: #f4f4f4;
+      --text-color: #333;
+      --card-bg: #fff;
+      --code-bg: #1e1e1e;
+      --code-color: #dcdcdc;
+      --tag-bg: #e0e0e0;
+      --tag-color: #333;
+      --button-bg: #0077cc;
+      --button-text: #fff;
+    }
+
+    body.dark-mode {
+      --bg-color: #121212;
+      --text-color: #eee;
+      --card-bg: #1f1f1f;
+      --code-bg: #2d2d2d;
+      --code-color: #f8f8f2;
+      --tag-bg: #333;
+      --tag-color: #ddd;
+      --button-bg: #444;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 20px;
+      transition: all 0.3s ease;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .search-bar input {
+      padding: 10px;
+      font-size: 1em;
+      width: 250px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .toggle-dark-mode {
+      cursor: pointer;
+      padding: 10px 15px;
+      border: none;
+      background-color: var(--button-bg);
+      color: var(--button-text);
+      border-radius: 5px;
+      font-size: 0.9em;
+    }
+
+    .code-entry {
+      background: var(--card-bg);
+      border-radius: 5px;
+      margin-bottom: 20px;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      transition: background 0.3s ease;
+    }
+
+    .code-title {
+      font-size: 1.2em;
+      margin-bottom: 10px;
+      color: #005f73;
+    }
+
+    pre {
+      background-color: var(--code-bg);
+      color: var(--code-color);
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+      font-family: Consolas, monospace;
+    }
+
+    .tags {
+      margin-top: 10px;
+    }
+
+    .tag {
+      display: inline-block;
+      background-color: var(--tag-bg);
+      color: var(--tag-color);
+      padding: 5px 10px;
+      border-radius: 3px;
+      font-size: 0.8em;
+      margin-right: 5px;
+      margin-top: 5px;
+    }
+
+    .actions {
+      margin-top: 10px;
+    }
+
+    .action-btn {
+      padding: 7px 12px;
+      margin-right: 10px;
+      border: none;
+      border-radius: 5px;
+      background-color: var(--button-bg);
+      color: var(--button-text);
+      cursor: pointer;
+      font-size: 0.85em;
+    }
+
+    .action-btn:hover {
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>C Code Archive</h1>
+
+  <div class="top-bar">
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search by title or tag..." onkeyup="filterCodes()">
+    </div>
+    <button class="toggle-dark-mode" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+  </div>
+
+  <!-- Code Entry 1 -->
+  <div class="code-entry" data-tags="hello world intro basic">
+    <div class="code-title">Hello World</div>
+    <pre><code id="code-1">
+#include &lt;stdio.h&gt;
+
+int main() {
+    printf("Hello, World!\n");
+    return 0;
+}
+    </code></pre>
+    <div class="tags">
+      <span class="tag">intro</span>
+      <span class="tag">basic</span>
+    </div>
+    <div class="actions">
+      <button class="action-btn" onclick="copyCode('code-1')">📋 Copy</button>
+      <button class="action-btn" onclick="downloadPDF('Hello World', 'code-1')">📄 Export PDF</button>
+    </div>
+  </div>
+
+  <!-- Code Entry 2 -->
+  <div class="code-entry" data-tags="recursion function math">
+    <div class="code-title">Factorial Using Recursion</div>
+    <pre><code id="code-2">
+#include &lt;stdio.h&gt;
+
+int factorial(int n) {
+    if (n == 0)
+        return 1;
+    else
+        return n * factorial(n - 1);
+}
+
+int main() {
+    int num = 5;
+    printf("Factorial of %d is %d\n", num, factorial(num));
+    return 0;
+}
+    </code></pre>
+    <div class="tags">
+      <span class="tag">recursion</span>
+      <span class="tag">function</span>
+      <span class="tag">math</span>
+    </div>
+    <div class="actions">
+      <button class="action-btn" onclick="copyCode('code-2')">📋 Copy</button>
+      <button class="action-btn" onclick="downloadPDF('Factorial Recursion', 'code-2')">📄 Export PDF</button>
+    </div>
+  </div>
+
+  <!-- Add more code entries below -->
+
+  <script>
+    function filterCodes() {
+      const input = document.getElementById('searchInput').value.toLowerCase();
+      const codeEntries = document.getElementsByClassName('code-entry');
+
+      Array.from(codeEntries).forEach(entry => {
+        const title = entry.querySelector('.code-title').innerText.toLowerCase();
+        const tags = entry.getAttribute('data-tags').toLowerCase();
+        if (title.includes(input) || tags.includes(input)) {
+          entry.style.display = 'block';
+        } else {
+          entry.style.display = 'none';
+        }
+      });
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+    }
+
+    function copyCode(codeId) {
+      const codeElement = document.getElementById(codeId);
+      const text = codeElement.innerText || codeElement.textContent;
+
+      navigator.clipboard.writeText(text).then(() => {
+        alert("✅ Code copied to clipboard!");
+      }).catch(err => {
+        alert("❌ Failed to copy: " + err);
+      });
+    }
+
+    async function downloadPDF(title, codeId) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const codeElement = document.getElementById(codeId);
+      const codeText = codeElement.innerText || codeElement.textContent;
+
+      const lines = doc.splitTextToSize(codeText, 180);
+      doc.setFont("Courier", "normal");
+      doc.setFontSize(10);
+      doc.text(lines, 10, 20);
+      doc.save(`${title.replace(/\s+/g, '_')}.pdf`);
+    }
+  </script>
+
+</body>
+</html>
